@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Image Captioning App</title>
+  </head>
+  <body>
+    <h1>Image Captioning App</h1>
+    <form action="/generate_captions" method="post" enctype="multipart/form-data">
+      <label for="image">Upload an image:</label>
+      <input type="file" id="image" name="image" required>
+      <br><br>
+      <label for="num_captions">Number of captions: (max 10)</label>
+      <input type="number" id="num_captions" name="num_captions" value="1" min="1" max="10" required>
+      <br><br>
+      <button type="submit">Generate Captions</button>
+    </form>
+    <br><br>
+    <div id="captions"></div>
+    <div id="image-container"></div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $('form').submit(function(event) {
+        event.preventDefault();
+        var formData = new FormData($('form')[0]);
+        $.ajax({
+          url: $(this).attr('action'),
+          type: $(this).attr('method'),
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function(response) {
+            var captions = response.captions;
+            var imgurUrl = response.imgur_url;
+            var captionsHtml = '';
+            for (var i = 0; i < captions.length; i++) {
+              captionsHtml += '<p>' + captions[i] + '</p>';
+            }
+            var imageHtml = '<img src="' + imgurUrl + '" alt="Uploaded Image" style="width: 200px; height: 200px;">';
+            $('#captions').html(captionsHtml);
+            $('#image-container').html(imageHtml);
+          },
+          error: function() {
+            alert('An error occurred while generating captions.');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
